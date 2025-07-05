@@ -1,4 +1,8 @@
 const prisma = require('../db');
+const { body } = require('express-validator');
+const { JSDOM } = require('jsdom')
+const { window } = new JSDOM('');
+const DOMPurify = require('dompurify')(window);
 
 const findTask = async (userId, search, status, dueDate) => {
   console.log(status)
@@ -67,4 +71,26 @@ const editTask = async (id, title, description, dueDate, status) => {
   return task;
 }
 
-module.exports = { findTask, findTaskById, insertTask, deleteTask, editTask };
+const sanitazeInput = value => {
+  if (!value) return value;
+  return DOMPurify.sanitize(value, {
+    ALLOWED_TAGS: ['b', 'i', 'a'],
+    ALLOWED_ATTR: ['href']
+  })
+}
+
+const validation = [
+  body('title')
+    .trim()
+    .notEmpty().withMessage('Title is required')
+    .isLength({ max: 100 }).withMessage('Title max 100 characters')
+    .matches(/^[a-zA-Z0-9 .,!?-]+$/).withMessage('Title only letters, numbers and basic punctuation')
+    .customSanitizer(sanitazeInput),
+  body('description')
+    .trim()
+    .optional()
+    .isLength({ max: 2000 }).withMessage('Description max 2000 characters')
+    .customSanitizer(value => sanitazeInput(value))
+]
+
+module.exports = { findTask, findTaskById, insertTask, deleteTask, editTask, validation };

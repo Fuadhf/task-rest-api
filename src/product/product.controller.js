@@ -3,7 +3,8 @@
 
 const express = require('express');
 const { getAllTask, createNewTask, getTaskById, deleteTaskById, editTaskById } = require('./product.service');
-const authenticate = require('../middleware/middleware.auth')
+const authenticate = require('../middleware/middleware.auth');
+const { validation } = require('./product.repository');
 const router = express.Router();
 
 router.get('/tasks', authenticate, async (req, res, next) => {
@@ -31,7 +32,7 @@ router.get('/task/:id', authenticate, async (req, res, next) => {
   }
 });
 
-router.post('/task', authenticate, async (req, res, next) => {
+router.post('/task', authenticate, validation, async (req, res, next) => {
   try {
     const { title, description, dueDate } = req.body;
     const uId = req.user.id;
@@ -45,7 +46,7 @@ router.post('/task', authenticate, async (req, res, next) => {
   }
 });
 
-router.put('/task/:id', authenticate, async (req, res, next) => {
+router.put('/task/:id', authenticate, validation, async (req, res, next) => {
   try {
     const taskId = req.params.id;
     console.log(taskId)

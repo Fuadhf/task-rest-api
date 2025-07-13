@@ -42,8 +42,8 @@ const validation = [
   body('password')
     .notEmpty().withMessage('Password is required')
     .isLength({ min: 6 }).withMessage('Password must be at least 6 character')
-    .matches(/[A-Z]/).withMessage('Password must contain capital leters'),
-    matches(/0-9/).withMessage('Password must contain number')
+    .matches(/[A-Z]/).withMessage('Password must contain capital leters')
+    .matches(/0-9/).withMessage('Password must contain number')
 ];
 
 module.exports = { insertUser, findUser, validation };
